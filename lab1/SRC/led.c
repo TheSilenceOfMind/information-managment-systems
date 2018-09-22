@@ -49,8 +49,8 @@ static unsigned char old_led = 0;   // "Видеопамять" линейки светодиодов
 
 void led( unsigned char n, unsigned char on )
 {
-unsigned char c;
-unsigned char mask = 1;
+    unsigned char c;
+    unsigned char mask = 1;
 
     if( n > 7 ) return;
 
