@@ -47,7 +47,7 @@ e-mail: kluchev@d1.ifmo.ru
 
 Пример:
 -----------------------------------------------------------------------------*/
-void write_max( unsigned char xdata *regnum, unsigned char val )
+void write_max( unsigned char __xdata *regnum, unsigned char val )
 {
 unsigned char oldDPP = DPP;
 
@@ -69,7 +69,7 @@ unsigned char oldDPP = DPP;
             расположены (куда отображаются) порты ввода-вывода ПЛИС
 Пример:
 -----------------------------------------------------------------------------*/
-unsigned char read_max( unsigned char xdata *regnum )
+unsigned char read_max( unsigned char __xdata *regnum )
 {
 unsigned char oldDPP=DPP;
 unsigned char val;

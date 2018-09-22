@@ -12,7 +12,7 @@
 #define SV          0x7
 
 
-void write_max( unsigned char xdata *regnum, unsigned char val );
-unsigned char read_max( unsigned char xdata *regnum );
+void write_max( unsigned char __xdata *regnum, unsigned char val );
+unsigned char read_max( unsigned char __xdata *regnum );
 
 #endif //__MAX__H
