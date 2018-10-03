@@ -74,7 +74,7 @@ void main( void )
 
     while (1)
     {
-        unsigned char dip_value = get_dip_values();
+        unsigned char dip_value = ~get_dip_values();
         if (dip_value == 0x77)
         {
             if (direction == 0)
@@ -95,6 +95,6 @@ void main( void )
         else // if wrong dip value -> display value from DIP.
             leds(dip_value);
 
-        delay(500); // half of a second
+        delay(300); // half of a second
     }
 }
