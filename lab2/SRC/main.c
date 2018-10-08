@@ -1,8 +1,10 @@
-﻿#include "aduc812.h"
-#include "led.h"
+﻿
 #include "max.h"
+#include "led.h"
+#include "ext_int.h"
+#include "count_timer.h"
 
-static unsigned short mode = 0;
+static unsigned short mode = 1;
 
 void change_mode () {
 	mode = !mode;
@@ -19,26 +21,21 @@ void delay ( unsigned long ms )
 }
 
 
-void main( void )
-{
+void main( void ) {
+	unsigned char arr[8] = {1, 2, 4, 8, 16, 32, 64, 128};
+	
+	init_timer1();
+	InitInt0();
+	leds(0);
+		
 	while (1) {
-		DisplayLeds(5000);
-		leds(0);
-		delay2(500);
+		if (mode) {
+			display_leds(5000, arr);
+			leds(0);
+			delay(500);
+		} else {
+			leds(0);
+		}		
 	}
-	/*
-	unsigned char light = 1;
-	InitSystimer0();
-	// Установка вектора в пользовательской таблице
-	SetVector( 0x200B, (void *)T0_ISR );
-	// Разрешение прерываний от таймера 0
-	ET0 = 1; EA = 1;
-	while( 1 )
-	{
-		leds( light );
-		if( light == 0xFF ) light = 1;
-		else light |= light << 1;
-		DelayMs( 300 );
-	}
-	*/
+	
 }   

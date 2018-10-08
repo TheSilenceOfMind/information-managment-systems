@@ -1,7 +1,6 @@
 #ifndef __MAX__H
 #define __MAX__H
 
-
 //Названия регистров
 #define KB          0x0
 #define DATA_IND    0x1
@@ -14,5 +13,4 @@
 
 void write_max( unsigned char __xdata *regnum, unsigned char val );
 unsigned char read_max( unsigned char __xdata *regnum );
-
 #endif //__MAX__H

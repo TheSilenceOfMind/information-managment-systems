@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Имя проекта
 
-NAME	= test_led
+NAME	= main
 
 # Настройки компилятора и линкера
 
@@ -22,7 +22,7 @@ TARBALL  = ${PROJNAME}.tar
 # Настройки M3P
 
 M3P		 = m3p
-COMPORT	 = com1
+COMPORT	 = com5
 COMLOG	 = $(COMPORT)_log.txt
 BAUD	 = 9600
 
@@ -31,7 +31,7 @@ BAUD	 = 9600
 SRC_DIR = SRC
 # ---------------------------------------------------------------------------
 
-all: test_led
+all: main
 
 clean:
 	del $(NAME).hex
@@ -62,16 +62,18 @@ term:
 
 
 LIST_SRC = \
+$(SRC_DIR)/count_timer.c \
+$(SRC_DIR)/ext_int.c \
 $(SRC_DIR)/led.c \
 $(SRC_DIR)/max.c \
-$(SRC_DIR)/dip.c \
-$(SRC_DIR)/test_led.c
+$(SRC_DIR)/sys_timer.c \
+$(SRC_DIR)/main.c
 
 LIST_OBJ = $(LIST_SRC:.c=.rel)
 
-test_led : $(LIST_OBJ) makefile
-	$(CC) $(LIST_OBJ) -o test_led.hex $(LFLAGS)
-	$(M3P) hb166 test_led.hex test_led.bin bye
+main: $(LIST_OBJ) makefile
+	$(CC) $(LIST_OBJ) -o main.hex $(LFLAGS)
+	$(M3P) hb166 main.hex main.bin bye
 
 
 $(LIST_OBJ) : %.rel : %.c makefile

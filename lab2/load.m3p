@@ -1,6 +1,6 @@
     terminateonerror
     -- Открытие com-порта (com1) на скорости 9600 бит/с
-    9600 openchannel com1
+    9600 openchannel com5
 
 : wait
 
@@ -17,7 +17,7 @@
 
     T_RAM
 
-    0x2100       write test_led.bin
+    0x2100       write main.bin
     0x2100       jmp
 
     0 term
