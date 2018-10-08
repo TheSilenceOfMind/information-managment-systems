@@ -46,16 +46,14 @@ void leds( unsigned char on ) {
 Чем больше порядковый номер в массиве, тем больше яркость того диода, который задается маской - элементом массива
 (индекс в массиве) - (процент яркости)
 0 - 0 
-1 - 0
-2 - 0
-3 - 20 
-4 - 40
-5 - 60
-6 - 80
-7 - 100
+1 - 20 
+2 - 40
+3 - 60
+4 - 80
+5 - 100
 */
 
-void display_leds (unsigned long ms, unsigned char leds_brights[8])  {
+void display_leds (unsigned long ms, unsigned char leds_brights[6])  {
     volatile unsigned long j;   
     volatile unsigned long rem;
     int t = 20; // период одного сигнала, необходим для изменения скважности сигнала
@@ -70,17 +68,17 @@ void display_leds (unsigned long ms, unsigned char leds_brights[8])  {
         rem = j % t;
         if (rem < b1) {  
             // самый первый промежуток периода => подадим высокий уровень сигнала на все светящиеся диоды
-            leds (leds_brights[3] | leds_brights[4] | leds_brights[5] | leds_brights[6] | leds_brights[7]);
+            leds (leds_brights[1] | leds_brights[2] | leds_brights[3] | leds_brights[4] | leds_brights[5]);
         } else if (rem < b2) {
             // подадим 0 на менее яркий диод, остальные пускай продолжают получать высокий уровень сигнала
-            leds (leds_brights[4] | leds_brights[5] | leds_brights[6] | leds_brights[7]);
+            leds (leds_brights[2] | leds_brights[3] | leds_brights[4] | leds_brights[5]);
         } else if (rem < b3) {
-            leds (leds_brights[5] | leds_brights[6] | leds_brights[7]);
+            leds (leds_brights[3] | leds_brights[4] | leds_brights[5]);
         } else if (rem < b4) {
-            leds (leds_brights[6] | leds_brights[7]);
+            leds (leds_brights[4] | leds_brights[5]);
         } else {
-            // единственный диод со стопроцентной яркостью => получает высокий уровень сигнала весь период
-            leds (leds_brights[7]);
+            //  диоды со стопроцентной яркостью => получает высокий уровень сигнала весь период
+            leds (leds_brights[5]);
         }
     }
 }
