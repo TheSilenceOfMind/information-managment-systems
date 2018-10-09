@@ -195,6 +195,7 @@ __sbit __at ( 0xF8 ) SPR0     ;
 #define TF1_VECTOR      3       /* 0x1b timer 1 */
 #define SI0_VECTOR      4       /* 0x23 serial port 0 */
 
+void SetVector(unsigned char __xdata * Address, void * Vector);
 
 #endif //__ADUC812_H
 
