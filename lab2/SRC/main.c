@@ -15,43 +15,51 @@ void change_mode () __interrupt (2) {
 void delay (unsigned long ms)
 {
     volatile unsigned long i, j;
-
     for(j = 0; j < ms; j++)
     {
         for(i = 0; i < 50; i++);
     }
 }
 
-void modify_arr (unsigned char direction) {
-	volatile unsigned int i;
-
-	if (direction == 0) {
-		arr[0] |= arr[1]; 
-		for (i = 1; i < 5; ++i)
-		{	
-			arr[i] = (arr[i] * 2 >= 128) ? 0 : arr[i] * 2 ;		
-		}
-		arr[5] = 128;
-	} else {
-		arr[5] /= 2;
-		for (i = 1; i < 5; ++i)
+void animation () {
+	volatile unsigned int i, j;
+	// первая часть анимации
+	for (j = 0; j < 8; ++j)
+	{
+		for (int i = 0; i < 4; ++i)
 		{
-			arr[i] = (arr[i-1] / 2 < 20) ? 0 : arr[i-1] / 2;
+			arr[i] = arr[i+1];
 		}
-		arr[0] <<= 1; 
-	}	
-}
-
-
-/*void modify_arr (unsigned char direction) {
-	volatile unsigned int i;
-
-	if (direction == 0) {
-	} else {
-
+		arr[4] *= 2;
+		display_leds(500, arr);
 	}
-}*/
 
+	delay(200);
+
+	//вторая часть анимации
+	arr[3] = 0;
+	for (j = 0; j < 4; ++j) {
+		for (int i = 0; i < 4; ++i)
+		{
+			arr[i] = arr[i+1];
+		}
+		display_leds(500, arr);
+	}
+
+	delay(200);
+
+	// третья часть анимациии
+	for (j = 0; j < 12; ++j){
+		for (int i = 0; i < 4; ++i)
+		{
+			arr[i] = arr[i+1];
+		}
+		arr[4] /= 2;
+		display_leds(500, arr);
+	}
+
+	delay(200);
+}
 
 void main( void ) {
 	volatile unsigned int i;
@@ -64,16 +72,7 @@ void main( void ) {
 		
 	while (1) {
 		if (mode) {
-			for (i = 0; i < 5; ++i)
-			{
-				display_leds(5000, arr);
-				modify_arr(0);
-			}
-			for (i = 0; i < 5; ++i)
-			{
-				display_leds(5000, arr);
-				modify_arr(1);
-			}
+			animation();
 		} else {
 			leds(get_count());
 		}		
