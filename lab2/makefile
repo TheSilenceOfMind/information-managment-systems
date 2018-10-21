@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------------
-# Имя проекта
+# пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 NAME	= main
 
-# Настройки компилятора и линкера
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 CC      = sdcc
 CFLAGS  = -I./INCLUDE -c --stack-auto
-LFLAGS  = --code-loc 0x2100 --xram-loc 0x6000 --stack-auto --stack-loc 0x80
+LFLAGS  = --code-loc 0x2100 --xram-loc 0x6000 --stack-auto --stack-loc 0x80 
 
-# Настройки системы автоинкремента версии сборки
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 PROJECT  = $(shell type PROJECT)
 VERSION  = $(shell type VERSION)
@@ -19,19 +19,19 @@ TYPE     = $(shell type TYPE)
 PROJNAME = ${PROJECT}-${VERSION}-${BUILD}-${TYPE}
 TARBALL  = ${PROJNAME}.tar
 
-# Настройки M3P
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ M3P
 
 M3P		 = m3p
-COMPORT	 = com5
+COMPORT	 = com4
 COMLOG	 = $(COMPORT)_log.txt
-BAUD	 = 9600
+BAUD	 = 9600	
 
-# Каталоги с исходными текстами
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 SRC_DIR = SRC
 # ---------------------------------------------------------------------------
 
-all: main
+all: test_led
 
 clean:
 	del $(NAME).hex
@@ -46,7 +46,7 @@ clean:
 	del $(SRC_DIR)\*.rel
 	del $(SRC_DIR)\*.rst
 	del $(SRC_DIR)\*.sym
-	del $(SRC_DIR)\*.lst
+	del $(SRC_DIR)\*.lst 
 
 load:
 	$(M3P) lfile load.m3p
@@ -62,19 +62,19 @@ term:
 
 
 LIST_SRC = \
-$(SRC_DIR)/count_timer.c \
-$(SRC_DIR)/ext_int.c \
 $(SRC_DIR)/led.c \
 $(SRC_DIR)/max.c \
-$(SRC_DIR)/sys_timer.c \
-$(SRC_DIR)/main.c
+$(SRC_DIR)/interrupt.c \
+$(SRC_DIR)/timer1.c \
+$(SRC_DIR)/main.c \
 
 LIST_OBJ = $(LIST_SRC:.c=.rel)
 
-main: $(LIST_OBJ) makefile
+test_led : $(LIST_OBJ) makefile
 	$(CC) $(LIST_OBJ) -o main.hex $(LFLAGS)
 	$(M3P) hb166 main.hex main.bin bye
 
 
 $(LIST_OBJ) : %.rel : %.c makefile
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@  
+

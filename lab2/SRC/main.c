@@ -1,104 +1,85 @@
-﻿
 #include "aduc812.h"
-#include "max.h"
 #include "led.h"
-#include "ext_int.h"
-#include "count_timer.h"
+#include "max.h"
+#include "timer1.h"
+#include "interrupt.h"
 
-static unsigned short mode = 1;
-static unsigned char arr[8] = {1 | 2 | 4, 8, 16, 32, 64, 128};
+static unsigned char arr [5] = {0, 0, 0, 0, 1};
 
-void change_mode () __interrupt (2) {
-	mode = !mode;
-}
-
-void delay (unsigned long ms)
-{
+void delay ( unsigned long ms )  {
     volatile unsigned long i, j;
-    for(j = 0; j < ms; j++)
-    {
-        for(i = 0; i < 50; i++);
+    for( j = 0; j < ms; j++ )  {
+        for( i = 0; i < 50; i++ );
     }
 }
 
-void animation () {
-	volatile unsigned int i, j;
-	// первая часть анимации
-	for (j = 0; j < 8; ++j)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			arr[i] = arr[i+1];
-		}
-		arr[4] *= 2;
-		display_leds(500, arr);
-	}
+static int counter = 0;
+static int mode = 0;
+static int direction_counter = 0;
 
-	delay(200);
 
-	//вторая часть анимации
-	arr[3] = 0;
-	for (j = 0; j < 4; ++j) {
-		for (int i = 0; i < 4; ++i)
-		{
-			arr[i] = arr[i+1];
-		}
-		display_leds(500, arr);
-	}
-
-	delay(200);
-
-	// третья часть анимациии
-	for (j = 0; j < 12; ++j){
-		for (int i = 0; i < 4; ++i)
-		{
-			arr[i] = arr[i+1];
-		}
-		arr[4] /= 2;
-		display_leds(500, arr);
-	}
-
-	delay(200);
+static void count() __interrupt (2)  {
+    counter++;
+    
+    TH1 = 0xFFFF >> 8; // ��������� �� ������� ������ 
+	TL1 = 0xFFFF; 
 }
 
-void main( void ) {
-	volatile unsigned int i;
+void change_mode() __interrupt (1)  {
+    if (mode == 0)
+        mode = 1;
+    else
+        mode = 0;
+    
+    //leds(counter);
+    //delay(200);
+}
+
+void swap_array() {
+	int i = 0;	
+    if (direction_counter == 0) {
+        arr[0] = 0;
+		arr[1] = 0;
+		arr[2] = 0;
+		arr[3] = 0;
+		arr[4] = 1;
+    }
+    if (direction_counter == 10) {
+        arr[0] = 0;
+		arr[1] = 0;
+		arr[2] = 0;
+		arr[3] = 0;
+		arr[4] = 128;
+    }
+
+    for (i = 0; i < 4; ++i) {
+        arr[i] = arr[i+1];
+    }
+
+    if (direction_counter < 10) {
+        arr[4] *= 2;
+    } else if (direction_counter < 20) {
+        arr[4] /= 2;		
+    } else {
+        direction_counter = -1;
+    }
 	
-	init_timer1();
-	init_int0((void*) change_mode);
-	EA = 1;		// разрешить прерывания
+	++direction_counter;
+} 
 
-	leds(0);
-		
-	while (1) {
-		if (mode) {
-			animation();
-		} else {
-			leds(get_count());
-		}		
-	}	
+void main( void )  {
+    write_max(ENA, 0x20);    
+    init_count_timer_1((void*)count, 1, 0xFFFF);
+    init_interrupt(0, (void*)change_mode);
+    
+    EA = 1;
+    
+    while (1) {
+        if (mode == 0) {
+            swap_array();
+            display_leds(300, arr);
+        } else {
+            leds(counter);
+        }
+    }
 }   
-
-//////////////////////// SetVector //////////////////////////
-// Функция, устанавливающая вектор прерывания в пользовательской таблице
-// прерываний.
-// Вход: Vector - адрес обработчика прерывания,
-// Address - вектор пользовательской таблицы прерываний.
-// Выход: нет.
-// Результат: нет.
-//////////////////////////////////////////////////////////////
-
-void SetVector(unsigned char __xdata * Address, void * Vector)
-{
-	unsigned char __xdata * TmpVector; // Временная переменная
-	// Первым байтом по указанному адресу записывается
-	// код команды передачи управления ljmp, равный 02h
-	*Address = 0x02;
-	// Далее записывается адрес перехода Vector
-	TmpVector = (unsigned char __xdata *) (Address + 1);
-	*TmpVector = (unsigned char) ((unsigned short)Vector >> 8);
-	++TmpVector;
-	*TmpVector = (unsigned char) Vector;
-	// Таким образом, по адресу Address теперь
-	// располагается инструкция ljmp Vector
-}
