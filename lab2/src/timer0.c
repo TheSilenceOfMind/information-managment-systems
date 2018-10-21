@@ -19,11 +19,9 @@ static void SetVector(unsigned char __xdata * Address, void * Vector)  {
 	// располагается инструкция ljmp Vector
 }
 
-//work == выпоняемая функция //typef == режим работы 
 void init_sys_timer_0( void * handlerf, unsigned short typef, unsigned short countf )  {
-    //option
-	handler = handlerf;
-	type = typef;
+	handler = handlerf;	//функция, выполняемая при прерывании
+	type = typef;	// режим работы таймера - таймер или счетчик
 	count = countf;
 
 	EA = 1;

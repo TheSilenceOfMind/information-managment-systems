@@ -14,29 +14,28 @@ static void SetVector(unsigned char __xdata * Address, void * Vector)  {
 	*TmpVector = (unsigned char) Vector;
 }
 
-//work == ���������� ������� //typef == ����� ������ 
-void init_count_timer_1( void * handler, unsigned short typef, unsigned short countf )  {
-    //option
+void init_count_timer_1( void * handler, unsigned short typef, unsigned short countf )  {	
 	type = typef;
 	count = countf;
     
 	ET1 = 1;
 
-	TR1 = 0; //���������� �������
-	TMOD = TMOD & 0x0F; //����� TMOD
-	if(typef == 1) {  // ����� ������ ������ 16-��������� ������� 
+	TR1 = 0; //Выключение таймера
+	TMOD = TMOD & 0x0F; // Сброс TMOD
+	// настройка таймера 1 в зависимости от выбранного режима
+	if (typef == 1) {
 		TMOD = TMOD | 0x50; 
 		SetVector(TF1_VECTOR_N, (void *)handler);
 	}
-	else {  // ����� ������ ������ 16-��������� ������ 
+	else {
 		TMOD = TMOD | 0x10; 
 		SetVector(TF1_VECTOR_N, (void *)handler);
 	}
 
-	TH1 = count >> 8; // ��������� �� ������� ������ 
+	TH1 = count >> 8;
 	TL1 = count; 
 
-	TR1 = 1; // ��������� ������� 0
+	TR1 = 1; 
 }
 
 unsigned long get_counter( void )  {

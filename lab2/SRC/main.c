@@ -21,7 +21,7 @@ static int direction_counter = 0;
 static void count() __interrupt (2)  {
     counter++;
     
-    TH1 = 0xFFFF >> 8; // ��������� �� ������� ������ 
+    TH1 = 0xFFFF >> 8; // настройка частоты работы таймера 
 	TL1 = 0xFFFF; 
 }
 
@@ -30,9 +30,6 @@ void change_mode() __interrupt (1)  {
         mode = 1;
     else
         mode = 0;
-    
-    //leds(counter);
-    //delay(200);
 }
 
 void swap_array() {
