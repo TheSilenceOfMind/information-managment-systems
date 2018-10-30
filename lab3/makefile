@@ -62,6 +62,8 @@ term:
 
 
 TEST_SERIAL_SRC = \
+$(SRC_DIR)/led.c \
+$(SRC_DIR)/max.c \
 $(SRC_DIR)/sio.c \
 $(SRC_DIR)/test_sio.c 
 
