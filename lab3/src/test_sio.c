@@ -84,13 +84,13 @@ void SIO_ISR( void ) __interrupt ( 4 )
 	if( TI )
 	{
 		// Данный блок отправляет цифру - сотни
-		if ( 100 < result )
+		if ( 100 <= result )
 		{
 			SBUF = ( result / 100 ) + '0';
 			result = result - ( result / 100 ) * 100;
 		}
 		// Данный блок отправляет цифру - десятки
-		else if ( 10 < result )
+		else if ( 10 <= result )
 		{
 			SBUF = ( result / 10 ) + '0';
 			result = result % 10;
