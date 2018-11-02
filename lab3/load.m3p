@@ -1,5 +1,5 @@
     terminateonerror
-    -- ЋвЄалвЁҐ com-Ї®ав  (com4) ­  бЄ®а®бвЁ 9600 ЎЁв/б
+    -- ЋвЄалвЁҐ com-Ї®ав  (com4) ­  бЄ®а®бвЁ 2400 ЎЁв/б
     9600 openchannel com4
 
 : wait
