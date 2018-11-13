@@ -1,7 +1,7 @@
 #ifndef __SIO__H
 #define __SIO__H
 
-//Константы скорости
+//РљРѕРЅСЃС‚Р°РЅС‚С‹ СЃРєРѕСЂРѕСЃС‚Рё
 #define S9600   0xFD
 #define S4800   0xFA
 #define S2400   0xF4
@@ -13,5 +13,6 @@ void wsio( unsigned char c );
 unsigned char rsio(void);
 void type(char * str);
 void init_sio( unsigned char speed  );
+void SetVector(unsigned char __xdata * Address, void * Vector);
 
 #endif // __SIO__H

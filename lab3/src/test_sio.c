@@ -1,6 +1,5 @@
-#include "aduc812.h"
-#include "sio.h"
 #include "led.h"
+#include "driver.h"
 
 #define NEWLINE_R 	0x0D
 #define NEWLINE_W	0x0A
@@ -14,7 +13,6 @@
 */
 unsigned char result, symbols;
 
-
 /**----------------------------------------------------------------------------
                         reset()
 -------------------------------------------------------------------------------
@@ -26,55 +24,6 @@ void reset() {
 	result = 0;
 	symbols = 0;
 }
-
-/**----------------------------------------------------------------------------
-                            SetVector
--------------------------------------------------------------------------------
-Вход:
-		Vector – адрес обработчика прерывания,
-		Address – вектор пользовательской таблицы прерываний.
-Выход:		нет
-Результат:	нет
-Описание:	Функция, устанавливающая вектор прерывания в
-			пользовательской таблие прерываний
------------------------------------------------------------------------------*/
-void SetVector(unsigned char __xdata * Address, void * Vector)
-{
-	unsigned char __xdata * TmpVector;
-	// Первым байтом по указанному адресу записывается // код команды передачи управления ljmp, равный 02h
-	*Address = 0x02;
-	// Далее записывается адрес перехода Vector
-	TmpVector = (unsigned char __xdata *) (Address + 1);
-	*TmpVector = (unsigned char) ((unsigned short)Vector >> 8);
-	++TmpVector;
-	*TmpVector = (unsigned char) Vector;
-	// Таким образом, по адресу Address теперь
-	// располагается инструкция ljmp Vector
-}
-
-/**----------------------------------------------------------------------------
-                            enable_interrupt
--------------------------------------------------------------------------------
-Описание:	Разрешает прерывания
------------------------------------------------------------------------------*/
-void enable_interrupt( void )
-{
-	EA = 1;
-	ES = 1;
-}
-
-
-/**----------------------------------------------------------------------------
-                            disable_interrupt
--------------------------------------------------------------------------------
-Описание:	Запрещает прерывания
------------------------------------------------------------------------------*/
-void disable_interrupt( void )
-{
-	EA = 0;
-	ES = 0;
-}
-
 
 /**----------------------------------------------------------------------------
                         mistake()
@@ -93,94 +42,47 @@ void mistake( void )
 	enable_interrupt();
 }
 
-/**----------------------------------------------------------------------------
-                            SIO_ISR
--------------------------------------------------------------------------------
-Вход:		нет
-Выход:		нет
-Описание:	Обработчик прерывания от последовательного канала
------------------------------------------------------------------------------*/
-void SIO_ISR( void ) __interrupt ( 4 )
+void write_number_to_UART(unsigned char number)
 {
-	unsigned char r_buf;
-	//Блок прерывания по отправлению данных
-	if( TI )
+	// Send hundreds
+	if ( 100 <= number )
 	{
-		// Данный блок отправляет цифру - сотни
-		if ( 100 <= result )
-		{
-			SBUF = ( result / 100 ) + '0';
-			result = result - ( result / 100 ) * 100;
-		}
-		// Данный блок отправляет цифру - десятки
-		else if ( 10 <= result )
-		{
-			SBUF = ( result / 10 ) + '0';
-			result = result % 10;
-			symbols = 2;
-		}
-		// Данный блок отправляет цифру - единицы
-		else if ( 2 == symbols )
-		{
-			SBUF = result + '0';
-			symbols = 1;
-		}
-		// Отправляем перенос строки
-		else if ( 1 == symbols )
-		{
-			SBUF = NEWLINE_W;
-			reset();
-		}
-
-		TI = 0;
+		write_UART((number / 100) + '0');
+		number = number % 100;
 	}
-
-	//Блок прерывания по приёму данных
-	if( RI )
+	// Send tens
+	if ( 10 <= number )
 	{
-		r_buf = SBUF;
-		leds( r_buf ); //Подсветка считанного символа для debug
-		RI = 0;
-
-		if ( '0' <= r_buf && r_buf <= '9' || 'A' <= r_buf && r_buf <= 'F')
-		{
-			unsigned char digit = (r_buf < 'A') ? (r_buf - '0') : (r_buf - 'A' + 10);
-			symbols++;
-
-			if ( symbols <= 2 ) // Если введено небольше 2 цифр
-				result = (result << 4) + digit;
-			else
-				mistake();
-		}
-		else if ( r_buf == NEWLINE_R )
-		{
-			// Перенос строки после ввода цифр
-			if ( symbols )
-			{
-				symbols = 2;
-				TI = 1;
-			}
-			else
-				mistake();
-		}
-		else // Введён некорректный символ
-			mistake();
+		write_UART((number / 10) + '0');
+		number = number % 10;
 	}
+	// Send ones and line break
+	write_UART(number + '0');
+	write_UART(NEWLINE_W);
+}
+
+void parse_received_symbol(unsigned char number)
+{
+	unsigned char digit = (number < 'A') ? (number - '0') : (number - 'A' + 10);
+	symbols++;
+
+	if ( symbols <= 2 ) // If input no more than 2 digits
+		result = (result << 4) + digit;
+	else
+		mistake();
 }
 
 void main( void )
 {
-	unsigned char c;
-	SetVector((unsigned char __xdata *)0x2023, (void *)SIO_ISR);
-	init_sio(S9600);
+	init_UART();
 	reset();
 
 	while( 1 )
 	{
-		//В положение DIP-переключателя 0xFF будем работать синхронно
+		// If position of DIP-switches equals 0xFF, then work without interrupts
 		if (DEFAULT_VAL == readdip() )
 		{
-			//На момент синхронной работы отключим прерывания
+			// Запрещаем прерывания
 			disable_interrupt();
 
 			if( rsiostat() )
@@ -199,6 +101,22 @@ void main( void )
 			}
 		}
 		else
+		{
+			unsigned char symbol;
 			enable_interrupt();
+			
+			if ( 0 < read_UART(&symbol) ){
+				if ( '0' <= symbol && symbol <= '9' || 'A' <= symbol && symbol <= 'F')
+					parse_received_symbol(symbol);
+				else if ( symbol == NEWLINE_R )
+					// Line break after input digits
+					if ( symbols )
+						write_number_to_UART(result);
+					else
+						mistake();
+				else // Receive uncorrect character
+					mistake();
+			}
+		}
 	}
 }

@@ -1,8 +1,6 @@
 #ifndef __MAX__H
 #define __MAX__H
 
-
-//Названия регистров
 #define KB          0x0
 #define DATA_IND    0x1
 #define EXT_LO      0x2

@@ -62,6 +62,7 @@ term:
 
 
 TEST_SERIAL_SRC = \
+$(SRC_DIR)/driver.c \
 $(SRC_DIR)/led.c \
 $(SRC_DIR)/max.c \
 $(SRC_DIR)/sio.c \
