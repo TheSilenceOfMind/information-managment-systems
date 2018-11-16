@@ -12,11 +12,13 @@
 #define MAX_PROGRAM_NUMBER 5
 #define MIN_TIME           10
 #define MAX_TIME           240
+#define MIN_TEMPERATURE    60
+#define MAX_TEMPERATURE    240
 
 
 void set_time( unsigned char program_number );
 void set_temperature( unsigned char program_number, unsigned char time );
-void cooking_process( void );
+void cooking_process( unsigned char program_number, unsigned char time, unsigned char temp );
 void wish_is_cooked( void );
 
 
@@ -85,8 +87,7 @@ void set_time( unsigned char program_number ){
 		switch (symbol)
 		{
 			case PREV_SIGN:
-				set_program();
-				break;
+				return;
 			case NEXT_SIGN:
 				set_temperature(program_number, time);
 				break;
@@ -112,10 +113,45 @@ void set_time( unsigned char program_number ){
 }
 
 void set_temperature( unsigned char program_number, unsigned char time ){
+	unsigned char msg[20] = "set t =  90°С\0";
+	unsigned char temp = 90;
+	unsigned char symbol;
 
+	PrintStringLCD(msg);
+	for ( ;; )
+	{
+		if (0 == read_keyboard(&symbol))
+			continue;
+
+		switch (symbol)
+		{
+			case PREV_SIGN:
+				return;
+			case NEXT_SIGN:
+				cooking_process(program_number, time, temp);
+				break;
+			case MORE_SIGN:
+				temp = (temp + 10 > MAX_TEMPERATURE) ? MIN_TEMPERATURE : temp + 10;
+				break;
+			case LESS_SIGN:
+				temp = (temp - 10 < MIN_TEMPERATURE) ? MAX_TEMPERATURE : temp - 10;
+				break;
+		}
+
+		if (temp < 100)
+		{
+			msg[8] = ' ';
+			write_number_to_str(msg, 9, temp, 0);
+		}
+		else
+		{
+			write_number_to_str(msg, 8, temp, 0);
+		}
+		PrintStringLCD(msg);
+	}
 }
 
-void cooking_process( void )
+void cooking_process( unsigned char program_number, unsigned char time, unsigned char temp )
 {
 
 }
