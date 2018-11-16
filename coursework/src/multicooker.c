@@ -10,15 +10,17 @@
 #define LESS_SIGN 'B'
 
 #define MAX_PROGRAM_NUMBER 5
+#define MIN_TIME           10
+#define MAX_TIME           240
 
 
 void set_time( unsigned char program_number );
-void set_temperature( void );
+void set_temperature( unsigned char program_number, unsigned char time );
 void cooking_process( void );
 void wish_is_cooked( void );
 
 
-void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number)
+void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number, char line_break)
 {
 	if (number < 10)
 	{
@@ -33,10 +35,11 @@ void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char nu
 	{
 		*(str + pos++) = '0' + (number / 100);
 		*(str + pos++) = '0' + ((number / 10) % 10);
-		*(str + pos++) = '0' + (number % 100);
+		*(str + pos++) = '0' + (number % 10);
 	}
 
-	*(str + pos++) = '\0';
+	if (line_break)
+		*(str + pos++) = '\0';
 }
 
 void set_program( void ){
@@ -63,16 +66,52 @@ void set_program( void ){
 				break;
 		}
 
-		write_number_to_str(msg, 12, program_number + 1);
+		write_number_to_str(msg, 12, program_number + 1, 1);
 		PrintStringLCD(msg);
 	}
 }
 
 void set_time( unsigned char program_number ){
+	unsigned char msg[17] = "set time  30 min\0"; 
+	unsigned char time = 30; 
+	unsigned char symbol;
 
+	PrintStringLCD(msg);
+	for ( ;; )
+	{
+		if (0 == read_keyboard(&symbol))
+			continue;	
+
+		switch (symbol)
+		{
+			case PREV_SIGN:
+				set_program();
+				break;
+			case NEXT_SIGN:
+				set_temperature(program_number, time);
+				break;
+			case MORE_SIGN:
+				time = (time + 5 > MAX_TIME) ? MIN_TIME : time + 5;
+				break;
+			case LESS_SIGN:
+				time = (time - 5 < MIN_TIME) ? MAX_TIME : time - 5;
+				break;
+		}
+
+		if (time < 100)
+		{
+			msg[9] = ' ';
+			write_number_to_str(msg, 10, time, 0);
+		}
+		else
+		{
+			write_number_to_str(msg, 9, time, 0);
+		}
+		PrintStringLCD(msg);
+	}
 }
 
-void set_temperature( void ){
+void set_temperature( unsigned char program_number, unsigned char time ){
 
 }
 
