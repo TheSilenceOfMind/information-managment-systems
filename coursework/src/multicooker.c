@@ -18,6 +18,27 @@ void cooking_process( void );
 void wish_is_cooked( void );
 
 
+void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number)
+{
+	if (number < 10)
+	{
+		*(str + pos++) = '0' + number;
+	}
+	else if (number < 100)
+	{
+		*(str + pos++) = '0' + (number / 10);
+		*(str + pos++) = '0' + (number % 10);
+	}
+	else
+	{
+		*(str + pos++) = '0' + (number / 100);
+		*(str + pos++) = '0' + ((number / 10) % 10);
+		*(str + pos++) = '0' + (number % 100);
+	}
+
+	*(str + pos++) = '\0';
+}
+
 void set_program( void ){
 	unsigned char msg[14] = "set program 1\0"; 
 	unsigned char program_number = 0; 
@@ -42,7 +63,7 @@ void set_program( void ){
 				break;
 		}
 
-		msg[12] = '1' + program_number;
+		write_number_to_str(msg, 12, program_number + 1);
 		PrintStringLCD(msg);
 	}
 }
