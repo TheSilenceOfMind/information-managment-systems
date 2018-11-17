@@ -47,7 +47,12 @@ void write_time_to_str(unsigned char* str,
 	unsigned char pos_min, unsigned char min,
 	unsigned char pos_sec, unsigned char sec)
 {
-	if (100 > min){
+	if (10 > min){
+		*(str + pos_min) = ' ';
+		*(str + pos_min + 1) = ' ';
+		write_number_to_str(str, pos_min + 2, min, 0);
+	}
+	else if (100 > min){
 		*(str + pos_min) = ' ';
 		write_number_to_str(str, pos_min + 1, min, 0);
 	}
@@ -67,7 +72,7 @@ void wait_sec(unsigned char * min, unsigned char * sec)
     volatile unsigned long i, j;
 
     // Delay
-    for( j = 0; j < 10; j++)//00; j++ )
+    for( j = 0; j < 1000; j++ )
     {
         for( i = 0; i < 50; i++ );
     }
