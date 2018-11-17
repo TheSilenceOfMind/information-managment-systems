@@ -3,7 +3,6 @@
 #include "lcd.h"
 #include "keyboard.h"
 
-#define MODE_COUNT  5
 #define NEXT_SIGN '#'
 #define PREV_SIGN '*'
 #define MORE_SIGN 'A'
@@ -44,7 +43,50 @@ void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char nu
 		*(str + pos++) = '\0';
 }
 
-void set_program( void ){
+void write_time_to_str(unsigned char* str,
+	unsigned char pos_min, unsigned char min,
+	unsigned char pos_sec, unsigned char sec)
+{
+	if (100 > min){
+		*(str + pos_min) = ' ';
+		write_number_to_str(str, pos_min + 1, min, 0);
+	}
+	else
+		write_number_to_str(str, pos_min, min, 0);
+
+	if (10 > sec){
+		*(str + pos_sec) = ' ';
+		write_number_to_str(str, pos_sec + 1, sec, 0);
+	}
+	else
+		write_number_to_str(str, pos_sec, sec, 0);
+}
+
+void wait_sec(unsigned char * min, unsigned char * sec)
+{
+    volatile unsigned long i, j;
+
+    // Delay
+    for( j = 0; j < 10; j++)//00; j++ )
+    {
+        for( i = 0; i < 50; i++ );
+    }
+
+	// Decrease time
+	if (0 < *sec)
+	{
+		*sec = *sec - 1;
+
+		if (0 == *sec && 0 < *min)
+		{
+			*min = *min - 1;
+			*sec = 60;
+		}
+	}
+}
+
+void set_program( void )
+{
 	unsigned char msg[14] = "set program 1\0"; 
 	unsigned char program_number = 0; 
 	unsigned char symbol;
@@ -73,7 +115,8 @@ void set_program( void ){
 	}
 }
 
-void set_time( unsigned char program_number ){
+void set_time( unsigned char program_number )
+{
 	unsigned char msg[17] = "set time  30 min\0"; 
 	unsigned char time = 30; 
 	unsigned char symbol;
@@ -112,7 +155,8 @@ void set_time( unsigned char program_number ){
 	}
 }
 
-void set_temperature( unsigned char program_number, unsigned char time ){
+void set_temperature( unsigned char program_number, unsigned char time )
+{
 	unsigned char msg[20] = "set t =  90°С\0";
 	unsigned char temp = 90;
 	unsigned char symbol;
@@ -151,14 +195,36 @@ void set_temperature( unsigned char program_number, unsigned char time ){
 	}
 }
 
-void cooking_process( unsigned char program_number, unsigned char time, unsigned char temp )
+void cooking_process( unsigned char program_number, unsigned char minutes, unsigned char temp )
 {
+	unsigned char msg[32] = "before cooking time 100 m 60 s\0";
+	unsigned char seconds = 60;
+	unsigned char symbol;
 
+	--minutes;
+	write_time_to_str(msg, 20, minutes, 26, seconds);
+	PrintStringLCD(msg);
+
+	for ( ;; )
+	{
+		wait_sec(&minutes, &seconds);
+		write_time_to_str(msg, 20, minutes, 26, seconds);
+		PrintStringLCD(msg);
+
+		if (0 == minutes && 0 == seconds)
+			wish_is_cooked();
+
+		if (0 != read_keyboard(&symbol) && PREV_SIGN == symbol)
+			set_program();
+	}
 }
 
 void wish_is_cooked( void )
 {
+	unsigned char msg[16] = "Wish is cooked!\0";
+	PrintStringLCD(msg);
 
+	set_program();
 }
 
 void main( void )
