@@ -24,11 +24,8 @@
 #define TWO_LINE        0x08
 //--
 
-extern void init_lcd(void);
 extern void clear_lcd(void);
 extern void print_char_lcd(char ch);
-extern void switch_cur_position_control(bit o);
-extern void switch_cursor(bit cursor, bit blink);
 extern void print_string_lcd(char* s, unsigned int n);
 
 #endif //_LCD_H	

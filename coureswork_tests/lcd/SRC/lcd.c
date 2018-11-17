@@ -94,47 +94,6 @@ void clear_lcd(void) {
     cur_y = 0;
 }
 
-/**----------------------------------------------------------------------------
-                        init_lcd()
--------------------------------------------------------------------------------
-Инициализация ЖКИ.
-
-Вход:       нет
-Выход:      нет
-Результат:  нет
------------------------------------------------------------------------------ */
-void init_lcd(void) {
-	unsigned short i;
-
-    for (i = 0; i < 4000; i++) continue; 	//Ожидание включения ЖКИ (>15мс после подачи 
-                                   		//питания)
-    write_max(DATA_IND, FUNCTION_SET | EIGHT_BITS);
-    strobe(0x8);
-    for (i = 0; i < 1500; i++) continue;	//Ожидание, предусмотренное протоколом
-                                   		//инициализации (>4.1мс)
-
-    write_max(DATA_IND, FUNCTION_SET | EIGHT_BITS);
-    strobe(0x8);
-    for (i = 0; i < 50; i++) continue;   //Ожидание, предусмотренное протоколом
-                                   //инициализации (>4.1мс)
-    write_max(DATA_IND, FUNCTION_SET | EIGHT_BITS);
-    strobe(0x8);
-
-    write_max(DATA_IND, FUNCTION_SET | EIGHT_BITS | TWO_LINE);
-    strobe(0x8);
-
-    write_max(DATA_IND, DISPLAY_CTRL); //Display off
-    strobe(0x8);
-
-    write_max(DATA_IND, CLEAR); 
-    strobe(0x8);
-
-    write_max(DATA_IND, ENTRY_MODE | INCR);
-    strobe(0x8);
-
-    write_max(DATA_IND, DISPLAY_CTRL | DISPLAY_ON); //Cursor OFF, Blinking OFF
-    strobe(0x8);
-}
 
 /**----------------------------------------------------------------------------
                         goto_xy()
