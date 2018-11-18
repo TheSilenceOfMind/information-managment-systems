@@ -96,7 +96,7 @@ void set_program( void )
 	unsigned char program_number = 0; 
 	unsigned char symbol;
 
-	PrintStringLCD(msg);
+	print_string_lcd(msg);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -116,7 +116,7 @@ void set_program( void )
 		}
 
 		write_number_to_str(msg, 12, program_number + 1, 1);
-		PrintStringLCD(msg);
+		print_string_lcd(msg);
 	}
 }
 
@@ -126,7 +126,7 @@ void set_time( unsigned char program_number )
 	unsigned char time = 30; 
 	unsigned char symbol;
 
-	PrintStringLCD(msg);
+	print_string_lcd(msg);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -156,7 +156,7 @@ void set_time( unsigned char program_number )
 		{
 			write_number_to_str(msg, 9, time, 0);
 		}
-		PrintStringLCD(msg);
+		print_string_lcd(msg);
 	}
 }
 
@@ -166,7 +166,7 @@ void set_temperature( unsigned char program_number, unsigned char time )
 	unsigned char temp = 90;
 	unsigned char symbol;
 
-	PrintStringLCD(msg);
+	print_string_lcd(msg);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -196,7 +196,7 @@ void set_temperature( unsigned char program_number, unsigned char time )
 		{
 			write_number_to_str(msg, 8, temp, 0);
 		}
-		PrintStringLCD(msg);
+		print_string_lcd(msg);
 	}
 }
 
@@ -208,13 +208,13 @@ void cooking_process( unsigned char program_number, unsigned char minutes, unsig
 
 	--minutes;
 	write_time_to_str(msg, 20, minutes, 26, seconds);
-	PrintStringLCD(msg);
+	print_string_lcd(msg);
 
 	for ( ;; )
 	{
 		wait_sec(&minutes, &seconds);
 		write_time_to_str(msg, 20, minutes, 26, seconds);
-		PrintStringLCD(msg);
+		print_string_lcd(msg);
 
 		if (0 == minutes && 0 == seconds)
 			wish_is_cooked();
@@ -227,7 +227,7 @@ void cooking_process( unsigned char program_number, unsigned char minutes, unsig
 void wish_is_cooked( void )
 {
 	unsigned char msg[16] = "Wish is cooked!\0";
-	PrintStringLCD(msg);
+	print_string_lcd(msg);
 
 	set_program();
 }
