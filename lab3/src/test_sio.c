@@ -61,6 +61,13 @@ void write_number_to_UART(unsigned char number)
 	write_UART(NEWLINE_W);
 }
 
+/**----------------------------------------------------------------------------
+                        parse_received_symbol
+-------------------------------------------------------------------------------
+Вход:		считанный символ
+Выход:		нет
+Описание:	Обновление result, проверка кол-ва введенных символов
+----------------------------------------------------------------------------- */
 void parse_received_symbol(unsigned char number)
 {
 	unsigned char digit = (number < 'A') ? (number - '0') : (number - 'A' + 10);
@@ -104,8 +111,8 @@ void main( void )
 		{
 			unsigned char symbol;
 			enable_interrupt();
-			
-			if ( 0 < read_UART(&symbol) ){
+
+			if ( 0 < read_UART(&symbol) ){ // reading from buffer and analyzing
 				if ( '0' <= symbol && symbol <= '9' || 'A' <= symbol && symbol <= 'F')
 					parse_received_symbol(symbol);
 				else if ( symbol == NEWLINE_R )
