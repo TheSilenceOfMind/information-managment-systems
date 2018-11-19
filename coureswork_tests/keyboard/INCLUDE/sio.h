@@ -8,10 +8,10 @@
 #define S2400   0xF4
 #define S1200   0xE8
 
-extern void Type(char * Str);
-extern void InitSIO(char speed, bit sdouble);
-extern void WSio(unsigned char c);
-extern unsigned char RSio(void);
-extern bit RSioStat(void);
+void Type(char * Str);
+void InitSIO(char speed, char sdouble);
+void WSio(unsigned char c);
+unsigned char RSio(void);
+char RSioStat(void);
 
 #endif //_SIO_H
