@@ -41,25 +41,57 @@ void delay ( unsigned long ms )
     }
 }
 
+void SetVector(unsigned char __xdata * Address, void * Vector)
+{
+    unsigned char __xdata * TmpVector; // Временная переменная
+    // Первым байтом по указанному адресу записывается // код команды передачи управления ljmp, равный 02h
+	*Address = 0x02;
+    // Далее записывается адрес перехода Vector
+	TmpVector = (unsigned char __xdata *) (Address + 1);
+	*TmpVector = (unsigned char) ((unsigned short)Vector >> 8);
+	++TmpVector;
+	*TmpVector = (unsigned char) Vector;
+    // Таким образом, по адресу Address теперь
+    // располагается инструкция ljmp Vector
+}
+
+// to test
+void print_keyboard_buffer_to_sio(void)
+{
+    int i;
+
+    for (i = 0; i < KB_BUFFER_SIZE; i++)
+        WSio(keyboard_buff[i]);
+}
+
+// to test
+void endless_dots_print(void)
+{
+    while (1)
+    {
+        WSio('.');
+        delay(500);
+    }
+}
+
 // http://embedded.ifmo.ru/sdk/sdk11/soft/examples/keil/demo_sdk11.zip
 //           in order to see source code
 void main( void )
 {
-    unsigned char ch;
-
+    // назначить обработчик прерывания (TF0) по переполнению таймера/счетчика 0
+    SetVector( 0x200B, (void *)TIMER_KB);
     InitSIO(S9600, 0);
-    Type("Hello!\r\n");
+    init_keyborad();
 
-    Type("\r\nReading keyboard\r\n");
-    while (1)
-    {
-        delay(50);
-        if( ScanKBOnce() != 0)
-        {
-            if (read_keyboard(&ch) == 0)
-                Type("Error\n");
-            else
-                WSio(ch);
-        }
-    }
+    print_keyboard_buffer_to_sio();
+    endless_dots_print();
+
+    // Type("Hello!\r\n");
+    // Type("\r\nReading keyboard:\r\n");
+    // while (1)
+    // {
+    //     unsigned char ch;
+    //     if (read_keyboard(&ch) != 0)
+    //         WSio(ch);
+    // }
 }
