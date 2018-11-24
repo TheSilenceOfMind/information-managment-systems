@@ -3,6 +3,8 @@
 #include "max.h"
 
 void main( void ) {
+	init_timer0();
+	
 	/*unsigned char light = 1;
 	init_timer0();
 	// Установка вектора в пользовательской таблице
