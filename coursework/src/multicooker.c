@@ -1,5 +1,6 @@
-//#include "led.h"
-//#include "max.h"
+#include "aduc812.h"
+#include "led.h"
+#include "max.h"
 #include "lcd.h"
 #include "keyboard.h"
 
@@ -18,7 +19,7 @@
 void set_time( unsigned char program_number );
 void set_temperature( unsigned char program_number, unsigned char time );
 void cooking_process( unsigned char program_number, unsigned char time, unsigned char temp );
-void wish_is_cooked( void );
+void dish_is_cooked( void );
 
 
 void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number, char line_break)
@@ -92,11 +93,11 @@ void wait_sec(unsigned char * min, unsigned char * sec)
 
 void set_program( void )
 {
-	unsigned char msg[14] = "set program 1\0"; 
+	unsigned char msg[14] = "set program 1";
 	unsigned char program_number = 0; 
 	unsigned char symbol;
 
-	print_string_lcd(msg);
+	print_string_lcd(msg, 13);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -116,17 +117,17 @@ void set_program( void )
 		}
 
 		write_number_to_str(msg, 12, program_number + 1, 1);
-		print_string_lcd(msg);
+		print_string_lcd(msg, 13);
 	}
 }
 
 void set_time( unsigned char program_number )
 {
-	unsigned char msg[17] = "set time  30 min\0"; 
+	unsigned char msg[17] = "set time  30 min";
 	unsigned char time = 30; 
 	unsigned char symbol;
 
-	print_string_lcd(msg);
+	print_string_lcd(msg, 16);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -156,17 +157,17 @@ void set_time( unsigned char program_number )
 		{
 			write_number_to_str(msg, 9, time, 0);
 		}
-		print_string_lcd(msg);
+		print_string_lcd(msg, 16);
 	}
 }
 
 void set_temperature( unsigned char program_number, unsigned char time )
 {
-	unsigned char msg[20] = "set t =  90°С\0";
+	unsigned char msg[20] = "set t =  90°С";
 	unsigned char temp = 90;
 	unsigned char symbol;
 
-	print_string_lcd(msg);
+	print_string_lcd(msg, 19);
 	for ( ;; )
 	{
 		if (0 == read_keyboard(&symbol))
@@ -196,44 +197,44 @@ void set_temperature( unsigned char program_number, unsigned char time )
 		{
 			write_number_to_str(msg, 8, temp, 0);
 		}
-		print_string_lcd(msg);
+		print_string_lcd(msg, 19);
 	}
 }
 
 void cooking_process( unsigned char program_number, unsigned char minutes, unsigned char temp )
 {
-	unsigned char msg[32] = "before cooking time 100 m 60 s\0";
+	unsigned char msg[32] = "before cooking  time 100 m 60 s";
 	unsigned char seconds = 60;
 	unsigned char symbol;
 
 	--minutes;
 	write_time_to_str(msg, 20, minutes, 26, seconds);
-	print_string_lcd(msg);
+	print_string_lcd(msg, 31);
 
 	for ( ;; )
 	{
 		wait_sec(&minutes, &seconds);
 		write_time_to_str(msg, 20, minutes, 26, seconds);
-		print_string_lcd(msg);
+		print_string_lcd(msg, 31);
 
 		if (0 == minutes && 0 == seconds)
-			wish_is_cooked();
+			dish_is_cooked();
 
 		if (0 != read_keyboard(&symbol) && PREV_SIGN == symbol)
 			set_program();
 	}
 }
 
-void wish_is_cooked( void )
+void dish_is_cooked( void )
 {
-	unsigned char msg[16] = "Wish is cooked!\0";
-	print_string_lcd(msg);
+	unsigned char msg[16] = "Dish is cooked!";
+	print_string_lcd(msg, 15);
 
 	set_program();
 }
 
 void main( void )
 {
-	init_keyboard();	
+	init_keyboard((void*)ScanKBOnce);
 	set_program();
 }

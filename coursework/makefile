@@ -22,7 +22,7 @@ TARBALL  = ${PROJNAME}.tar
 # Настройки M3P
 
 M3P		 = m3p
-COMPORT	 = com4
+COMPORT	 = com5
 COMLOG	 = $(COMPORT)_log.txt
 BAUD	 = 9600	
 

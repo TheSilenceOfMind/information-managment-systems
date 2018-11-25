@@ -1,6 +1,6 @@
     terminateonerror
     -- ЋвЄалвЁҐ com-Ї®ав  (com4) ­  бЄ®а®бвЁ 9600 ЎЁв/б
-    9600 openchannel com4
+    9600 openchannel com5
 
 : wait
     
