@@ -70,9 +70,15 @@ void main( void )
 	Type("Hello!\r\n");
 	Type("\r\nReading keyboard:\r\n");
 	
+	Type("test\n");
+	
+	
 	while (1) {
 		unsigned char ch;
-		if (read_keyboard(&ch) != 0)
-			WSio(ch);
+		EA = 0;
+		while (read_keyboard(&ch) > 0) WSio(ch);
+		EA = 1;
+		//delay(1000);
+		
 	}
 }

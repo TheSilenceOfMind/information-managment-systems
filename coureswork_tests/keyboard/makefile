@@ -22,7 +22,7 @@ TARBALL  = ${PROJNAME}.tar
 # Настройки M3P
 
 M3P		 = m3p
-COMPORT	 = com4
+COMPORT	 = com5
 COMLOG	 = $(COMPORT)_log.txt
 BAUD	 = 9600
 
@@ -65,7 +65,8 @@ LIST_SRC = \
 $(SRC_DIR)/keyboard.c \
 $(SRC_DIR)/sio.c \
 $(SRC_DIR)/max.c \
-$(SRC_DIR)/test_led.c
+$(SRC_DIR)/test_led.c \
+$(SRC_DIR)/led.c
 
 LIST_OBJ = $(LIST_SRC:.c=.rel)
 
