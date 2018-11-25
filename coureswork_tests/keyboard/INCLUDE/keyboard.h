@@ -3,9 +3,8 @@
 
 #define KB_BUFFER_SIZE 16
 
-void TIMER_KB(void) __interrupt( 2 );
-char ScanKBOnce(void);
-void init_keyborad(void);
+char ScanKBOnce(void) __interrupt( 0 );
+void init_keyboard(void* handler);
 char read_keyboard(unsigned char* symbol);
 
 // just to test
