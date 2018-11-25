@@ -129,7 +129,7 @@ char read_keyboard(unsigned char* symbol) {
 Результат:  0 - ни одна клавиша не была нажата при сканировании;
             1 - зарегистрировано нажатие.
 ----------------------------------------------------------------------------- */
-char ScanKBOnce(void) __interrupt( 0 )
+void ScanKBOnce(void) __interrupt( 0 )
 {
     unsigned char row,col,rownum,colnum;
     unsigned int i;
@@ -192,5 +192,4 @@ char ScanKBOnce(void) __interrupt( 0 )
 		}
 	
 	IE0 = 0;
-    return 0; //Ни одна клавиша не нажата
 }
