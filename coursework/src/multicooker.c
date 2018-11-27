@@ -242,9 +242,17 @@ char cooking_process( unsigned char program_number, unsigned char minutes, unsig
 
 char dish_is_cooked( void )
 {
+	char i;
 	unsigned char msg[16] = "Dish is cooked!";
 	print_string_lcd(msg, 15);
-	delay(1500);
+
+	for (i = 0; i < 3; ++i)
+	{
+		leds(0);
+		delay(300);
+		leds(255);
+		delay(300);
+	}
 	
 	return 1;
 }
