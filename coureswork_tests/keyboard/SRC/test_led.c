@@ -41,25 +41,44 @@ void delay ( unsigned long ms )
     }
 }
 
-// http://embedded.ifmo.ru/sdk/sdk11/soft/examples/keil/demo_sdk11.zip
-//           in order to see source code
-void main( void )
+// to test
+void print_keyboard_buffer_to_sio(void)
 {
-    unsigned char ch;
+    int i;
 
-    InitSIO(S9600, 0);
-    Type("Hello!\r\n");
+    for (i = 0; i < KB_BUFFER_SIZE; i++)
+        WSio(keyboard_buff[i]);
+}
 
-    Type("\r\nReading keyboard\r\n");
+// to test
+void endless_dots_print(void)
+{
     while (1)
     {
-        delay(50);
-        if( ScanKBOnce() != 0)
-        {
-            if (read_keyboard(&ch) == 0)
-                Type("Error\n");
-            else
-                WSio(ch);
-        }
+        WSio('.');
+        delay(500);
     }
+}
+
+void main( void )
+{
+	InitSIO(S9600, 0);
+    init_keyboard((void *)ScanKBOnce);
+    
+	EA = 1; // разрешить прерывания
+	
+	Type("Hello!\r\n");
+	Type("\r\nReading keyboard:\r\n");
+	
+	Type("test\n");
+	
+	
+	while (1) {
+		unsigned char ch;
+		EA = 0;
+		while (read_keyboard(&ch) > 0) WSio(ch);
+		EA = 1;
+		//delay(1000);
+		
+	}
 }

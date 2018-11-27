@@ -33,6 +33,9 @@ N Дата     Версия   Автор               Описание
 ******************************************************************************/
 #include "max.h"
 #include "keyboard.h"
+#include "aduc812.h"
+#include "sio.h"
+#include "led.h"
 
 /*----------------------------------------------------------------------------
             Переменные и флаги
@@ -40,21 +43,56 @@ N Дата     Версия   Автор               Описание
 
 char KBTable[]="147*2580369#ABCD"; //Таблица символов, соответствующих клавишам
                                    //клавиатуры SDK-1.
+								   
+unsigned char key_flags[16];
+	
 unsigned char keyboard_buff[KB_BUFFER_SIZE]; // Буффер, в который записываются
 unsigned char keyboard_len;
+
+
+static void SetVector(unsigned char __xdata * Address, void * Vector)  {
+	unsigned char __xdata * TmpVector; 
+	*Address = 0x02;
+	TmpVector = (unsigned char __xdata *) (Address + 1);
+	*TmpVector = (unsigned char) ((unsigned short)Vector >> 8);
+	++TmpVector;
+	*TmpVector = (unsigned char) Vector;
+}
 
 /**----------------------------------------------------------------------------
                         init_keyborad()
 -------------------------------------------------------------------------------
-Инициализация переменной длины заполненного буфера.
+Инициализация  буфера и регистров, назначение обработчика прерывния клавиатуры.
 
-Вход:   нет
+Вход:   указатель на функцию обработчик прерывания.
 Выход:  нет
 Результат: нет
 ----------------------------------------------------------------------------- */
-void init_keyborad(void)
+void init_keyboard(void* handler)
 {
+    int i;
+	unsigned char old_ena;
+	
     keyboard_len = 0;
+    for (i = 0; i < KB_BUFFER_SIZE; i++)
+        keyboard_buff[i] = 0;
+	
+	old_ena = read_max(ENA);
+	write_max(ENA, old_ena | 0x40); // Разрешить прерывание от клавиатуры (6-й бит регистра ENA должен быть <1>);
+	
+	// Проверить следующую команду! Возможно, необходимо использовать "1", в учебнике четко не сказано.
+	IT0 = 0; // Настроить внешнее прерывание INT0 так, чтобы оно работало по спаду, а не по уровню (регистр специального назначения TCON);
+			 // по спаду - 1, по уровню - 0
+	EX0 = 1; // Разрешить внешнее прерывание INT0 (бит EX0 = 1 в регистре специального назначения IE);
+	
+	old_ena = read_max(ENA);
+	write_max(ENA, old_ena | 0x20); // Переключатели SW3 должны быть в положении OFF, а 5-й бит регистра ENA (ПЛИС) должен быть <1>;
+	
+	SetVector(IE0_VECTOR_N, (void *)handler);
+	
+	//
+	for (i = 0; i < 16; ++i)
+		key_flags[i] = 0;
 }
 
 /**----------------------------------------------------------------------------
@@ -93,11 +131,13 @@ char read_keyboard(unsigned char* symbol) {
 Результат:  0 - ни одна клавиша не была нажата при сканировании;
             1 - зарегистрировано нажатие.
 ----------------------------------------------------------------------------- */
-char ScanKBOnce(void)
+char ScanKBOnce(void) __interrupt( 0 )
 {
     unsigned char row,col,rownum,colnum;
     unsigned int i;
-
+	unsigned char fl = 0;
+	static unsigned char aaa = 0;
+	
     //Сканирование производится по "столбцам" клавиатуры, на которые подается
     //"бегущий 0".
     //
@@ -106,6 +146,8 @@ char ScanKBOnce(void)
     //      (проверяем каждую "горизонталь" в каждой вертикали/столбце )
     //      и проверять, замкнута ли она. Если да, то ее
     //      будет отображено в регистре KB (см.док-ию).
+	EA = 0;
+	leds(++aaa);
     for(colnum = 0; colnum < 4; colnum++)
     {
         col = 0x1 << colnum; //0001,0010,0100,1000,0001,...
@@ -119,21 +161,40 @@ char ScanKBOnce(void)
             row = read_max(KB) & (0x10 << rownum);
             if( !row ) //Обнаружено нажатие клавиши:
             {
-                for(i = 0; i<10000; i++)continue;//проверка на дребезг контакта:
+                for(i = 0; i<5000; i++)continue;//проверка на дребезг контакта:
                        //через примерно 40мс повтор сканирования той же клавиши
 
                 row = read_max(KB) & (0x10 << rownum);
                 if( !row )
                 {
-                    keyboard_buff[keyboard_len % KB_BUFFER_SIZE] = (KBTable[(colnum<<2) + rownum]);
-                    keyboard_len++;
-                    return 1; //Стабильное нажатие клавиши
+					fl = 1;
+					if (key_flags[(colnum<<2) + rownum] == 1)
+						key_flags[(colnum<<2) + rownum] = 2;
+					else if (key_flags[(colnum<<2) + rownum] == 0)
+						key_flags[(colnum<<2) + rownum] = 1;
                 }
-
+				else{
+					key_flags[(colnum<<2) + rownum] = 0;
+				}
             }
         }
+		
+		if (fl == 0)
+		{
+			key_flags[(colnum<<2) + 0] = 0;
+			key_flags[(colnum<<2) + 1] = 0;
+			key_flags[(colnum<<2) + 2] = 0;
+			key_flags[(colnum<<2) + 3] = 0;
+		}
 
     }
 
+	for (i = 0; i < 16; ++i)
+		if (key_flags[i] == 1){
+			keyboard_buff[keyboard_len % KB_BUFFER_SIZE] = KBTable[i];
+			keyboard_len++;
+		}
+	
+	IE0 = 0;
     return 0; //Ни одна клавиша не нажата
 }
