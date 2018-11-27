@@ -171,11 +171,11 @@ char set_time( unsigned char program_number )
 
 char set_temperature( unsigned char program_number, unsigned char time )
 {
-	unsigned char msg[20] = "set t =  90 degrees";
+	unsigned char msg[31] = "set t =  90     degrees Celsius";
 	unsigned char temp = 90;
 	unsigned char symbol;
 
-	print_string_lcd(msg, 19);
+	print_string_lcd(msg, 30);
 	for ( ;; )
 	{
 		if (0 == read_key(&symbol))
@@ -205,7 +205,7 @@ char set_temperature( unsigned char program_number, unsigned char time )
 		{
 			write_number_to_str(msg, 8, temp, 0);
 		}
-		print_string_lcd(msg, 19);
+		print_string_lcd(msg, 30);
 	}
 }
 
