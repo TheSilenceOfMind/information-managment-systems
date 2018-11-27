@@ -1,7 +1,7 @@
 #include "lcd.h"
 #include "max.h"
 
-static bit curr_position_ctrl = 1;   	// Отслеживание драйвером текущей позиции курсора
+static char curr_position_ctrl = 1;   	// Отслеживание драйвером текущей позиции курсора
                             			// ЖКИ (1 - вкл., 0 - выкл.)
 
 // Текущая позиция курсора. Имеют смысл, только если curr_position_ctrl = 1.
@@ -21,7 +21,7 @@ static char cur_y = 0; 	// 0/1
 Выход:      нет
 Результат:  нет
 ----------------------------------------------------------------------------- */
-void switch_cur_position_control(bit o) {
+void switch_cur_position_control(char o) {
     curr_position_ctrl = o;
 }
 
@@ -46,8 +46,8 @@ void switch_cur_position_control(bit o) {
 void strobe(char c) {
 	unsigned int i;
 
-    write_max(C_IND, c | 0x1);  //Установка строба E
-    write_max(C_IND, c & 0xFE); //Сброс строба
+    write_max((unsigned char __xdata *)C_IND, c | 0x1);  //Установка строба E
+    write_max((unsigned char __xdata *)C_IND, c & 0xFE); //Сброс строба
 
     for (i = 0; i < 300; i++) 
     	continue; 				//Задержка на время исполнения команды (>1.59ms)    
@@ -66,10 +66,10 @@ void strobe(char c) {
 Выход:      нет
 Результат:  нет
 ----------------------------------------------------------------------------- */
-void switch_cursor (bit cursor, bit blink) {
+void switch_cursor (char cursor, char blink) {
 	unsigned char i = 0;
 
-    write_max(DATA_IND, DISPLAY_CTRL |
+    write_max((unsigned char __xdata *)DATA_IND, DISPLAY_CTRL |
     					DISPLAY_ON | 
     					((cursor) ? CURSOR_ON : 0) |
                         ((blink) ? BLINK : 0));
@@ -88,7 +88,7 @@ void switch_cursor (bit cursor, bit blink) {
 Результат:  нет
 ----------------------------------------------------------------------------- */
 void clear_lcd(void) {
-    write_max(DATA_IND, CLEAR);
+    write_max((unsigned char __xdata *)DATA_IND, CLEAR);
     strobe(0x8); 		// R/W = 0; RS = 0
     cur_x = 0;
     cur_y = 0;
@@ -105,8 +105,8 @@ void clear_lcd(void) {
 Выход:      нет
 Результат:  нет
 ----------------------------------------------------------------------------- */
-void goto_xy(unsigned char x, bit y) {
-    write_max(DATA_IND, RAM_DD | (x + ((y) ? 0x40 : 0))); //установка адреса DDRAM в счетчик адреса.
+void goto_xy(unsigned char x, char y) {
+    write_max((unsigned char __xdata *)DATA_IND, RAM_DD | (x + ((y) ? 0x40 : 0))); //установка адреса DDRAM в счетчик адреса.
     strobe(0x8);    
     cur_x = x;
     cur_y = y;
@@ -130,14 +130,14 @@ cur_y (при этом она увеличивается с каждым выв�
 void print_char_lcd(char ch) {
     if (curr_position_ctrl) {
         goto_xy(cur_x, cur_y);
-        cur_x += 15;
+        cur_x += 1;
         if (cur_x > 15) {	//переход на следующую строку 
         	cur_x = 0;
         	cur_y = (cur_y == 0) ? 1 : 0;
         }
     }
 
-    write_max(DATA_IND, ch);
+    write_max((unsigned char __xdata *)DATA_IND, ch);
     strobe(0xC);	//R/W = 0, RS = 1 (данные)
 }
 
@@ -154,7 +154,9 @@ void print_char_lcd(char ch) {
 ----------------------------------------------------------------------------- */
 void print_string_lcd (char* s, unsigned int n) {
     unsigned short i;
-	bit t = curr_position_ctrl;
+	char t = curr_position_ctrl;
+
+	clear_lcd();
     switch_cur_position_control(1);	// включаем отслеживание текущей позиции курсора
     for (i = 0; i < n; i++) 
     	print_char_lcd(s[i]);
