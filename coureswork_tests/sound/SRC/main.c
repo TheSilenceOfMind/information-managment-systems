@@ -6,13 +6,12 @@
 работы должны быть разработаны драйверы системного таймера, таймера-счетчика,
 звукового излучателя, светодиодных индикаторов.
 */
-#include "helper.h"
+#include "aduc812.h"
 #include "speaker.h"
 
 void Init()
 {
-    InitSpeaker();
-    //InitTimer();
+	make_sound(0);
     EA = 1;
 }
 

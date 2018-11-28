@@ -22,7 +22,7 @@ TARBALL  = ${PROJNAME}.tar
 # ��������� M3P
 
 M3P		 = m3p
-COMPORT	 = com5
+COMPORT	 = com3
 COMLOG	 = $(COMPORT)_log.txt
 BAUD	 = 9600	
 
@@ -68,7 +68,7 @@ $(SRC_DIR)/helper.c \
 $(SRC_DIR)/speaker.c \
 $(SRC_DIR)/main.c \
 $(SRC_DIR)/max.c \
-$(SRC_DIR)/led.c 
+$(SRC_DIR)/led.c
 
 LIST_OBJ = $(LIST_SRC:.c=.rel)
 

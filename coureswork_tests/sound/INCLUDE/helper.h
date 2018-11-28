@@ -6,6 +6,6 @@
 
 void set_vector(unsigned char __xdata *address, void *vector);
 void write_max(unsigned char __xdata *regnum, unsigned char value);
-void compute_note_delay(unsigned char index);
+void compute_note_delay(unsigned char mode, unsigned char index);
 
 #endif //__HELPER__H

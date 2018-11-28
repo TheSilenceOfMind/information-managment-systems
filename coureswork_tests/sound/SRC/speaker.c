@@ -6,6 +6,9 @@
 
 extern uint8_t note_delay[2];
 extern const uint16_t notes[];
+extern const uint16_t ok_btn_notes[];
+extern const uint16_t err_btn_notes[];
+unsigned char cur_mode;
 
 unsigned char current_ena;
 unsigned char cur_note_ind = 0;
@@ -22,6 +25,14 @@ const uint16_t notes[] = {
 		311, 369, 311, 466, 392
 };
 
+const uint16_t ok_btn_notes[] = {
+	200, 400, 600
+};
+
+const uint16_t err_btn_notes[] = {
+	600, 400, 200
+};
+
 uint8_t note_delay[2];
 
 // нормировочная функция для калибровки времени воспроизведения нот с разной частотой к какой-то нормали
@@ -30,14 +41,21 @@ unsigned int get_scaled_delay(uint16_t note) {
 	return (unsigned int)(500 * koef); // 300 - среднее время воспроизведения одной ноты (в единицах цикла). Находится подгонианом))0)
 }
 
-void set_next_note(){	
-	compute_note_delay(cur_note_ind);
-	cur_note_time = get_scaled_delay(notes[cur_note_ind]);
+void set_next_note(unsigned char mode){
+	compute_note_delay(mode, cur_note_ind);
+	if (mode == 2)
+		cur_note_time = get_scaled_delay(notes[cur_note_ind]);
+	else
+		cur_note_time = 200;
 	
 	cur_note_ind++;
-	cur_note_ind = cur_note_ind % 39; // 39 - кол-во элементов notes[]
+	if (mode == 2)
+		cur_note_ind = cur_note_ind % 39; // 39 - кол-во элементов notes[]
+	else 
+		cur_note_ind = cur_note_ind % 3;
+	
 	if (cur_note_ind == 0)
-		end_of_melody = 0;
+		end_of_melody = 1;
 	
 	// to test
 	++c;
@@ -58,7 +76,7 @@ void note_handler() __interrupt(5)
 	if (end_of_melody == 1)
 		T2CON = 0x00; // Выключение таймера 2
 	if (--cur_note_time == 0) 
-		set_next_note();
+		set_next_note(cur_mode);
 }
 
 void set_volume(unsigned char v) {
@@ -67,13 +85,20 @@ void set_volume(unsigned char v) {
 	write_max(ENA, current_ena);
 }
 
-void InitSpeaker()
+/* 
+mode: 
+	0 - success key press
+	1 - failure key press
+	2 - end of cook process
+*/
+void make_sound(unsigned char mode)
 {	
 	T2CON = 0x00; // Выключение таймера 2
 	
 	end_of_melody = 0;
 	set_volume(volume);
-    set_next_note();
+    set_next_note(mode);
+	cur_mode = mode; // Необходимо для того, чтобы обработчик прерывания идентифицировал, какой режим сейчас работает.
     set_vector(0x202B, (void *)note_handler);
 	
     T2CON = 0x04; // Включение таймера 2
