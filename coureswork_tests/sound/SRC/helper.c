@@ -1,5 +1,6 @@
 #include "aduc812.h"
 #include "helper.h"
+#include "max.h"
 
 extern unsigned char note_delay[];
 extern const uint16_t notes[];
@@ -17,24 +18,6 @@ void set_vector(unsigned char __xdata *address, void *vector)
     *tmp = (unsigned char)vector;
 }
 
-void write_max(unsigned char __xdata *regnum, unsigned char value)
-{
-    unsigned char old_dpp = DPP;
-
-    DPP = 8;
-    *regnum = value;
-    DPP = old_dpp;
-}
-
-void set_led(unsigned char value)
-{
-    write_max(7, value);
-}
-
-void set_ena(unsigned char value)
-{
-    write_max(4, value);
-}
 void compute_note_delay(unsigned char index)
 {
     uint16_t delay = 0xffff - 460791 / notes[index];

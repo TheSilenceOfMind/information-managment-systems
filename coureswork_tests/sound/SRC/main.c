@@ -7,7 +7,6 @@
 звукового излучателя, светодиодных индикаторов.
 */
 #include "helper.h"
-#include "timer.h"
 #include "speaker.h"
 
 void Init()
