@@ -35,9 +35,9 @@ void set_next_note(){
 	cur_note_time = get_scaled_delay(notes[cur_note_ind]);
 	
 	cur_note_ind++;
-	cur_note_ind = cur_note_ind % 4; // 39 - кол-во элементов notes[]
+	cur_note_ind = cur_note_ind % 39; // 39 - кол-во элементов notes[]
 	if (cur_note_ind == 0)
-		end_of_melody = 1;
+		end_of_melody = 0;
 	
 	// to test
 	++c;
