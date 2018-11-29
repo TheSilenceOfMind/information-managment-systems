@@ -227,19 +227,26 @@ char cooking_process( void )
 
 char dish_is_cooked( void )
 {
-	char i;
-	print_string_lcd(dish_is_cooked_msg, 15);
+    print_string_lcd(dish_is_cooked_msg, 15);
+    make_sound(2);
 
-	make_sound(2);
-	for (i = 0; i < 10; ++i)
-	{
-		leds(0);
-		delay(300);
-		leds(255);
-		delay(300);
-	}
-	
-	return 1;
+    for ( ;; )
+    {
+        leds(0);
+        delay(300);
+        leds(255);
+        delay(300);
+
+        if (read_key(&symbol) > 0)
+            if (PREV_SIGN == symbol || NEXT_SIGN == symbol ||
+                LESS_SIGN == symbol || MORE_SIGN == symbol)
+            {
+                make_sound(0);
+                break;
+            }
+    }
+
+    return 1;
 }
 
 void main( void )
