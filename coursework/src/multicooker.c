@@ -34,15 +34,13 @@ char dish_is_cooked( void );
 
 char read_key(unsigned char* symbol)
 {
-	unsigned char key;
 	EX0 = 1;
 	IP |= 0x20;
-	key = read_keyboard(symbol);
-	
-	return key;
+
+	return read_keyboard(symbol);
 }
 
-void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number, char line_break)
+void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char number)
 {
 	if (number < 10)
 	{
@@ -59,9 +57,6 @@ void write_number_to_str(unsigned char* str, unsigned char pos, unsigned char nu
 		*(str + pos++) = '0' + ((number / 10) % 10);
 		*(str + pos++) = '0' + (number % 10);
 	}
-
-	if (line_break)
-		*(str + pos++) = '\0';
 }
 
 void write_time_to_str(unsigned char* str,
@@ -71,24 +66,24 @@ void write_time_to_str(unsigned char* str,
 	if (10 > min){
 		*(str + pos_min) = ' ';
 		*(str + pos_min + 1) = ' ';
-		write_number_to_str(str, pos_min + 2, min, 0);
+		write_number_to_str(str, pos_min + 2, min);
 	}
 	else if (100 > min){
 		*(str + pos_min) = ' ';
-		write_number_to_str(str, pos_min + 1, min, 0);
+		write_number_to_str(str, pos_min + 1, min);
 	}
 	else
-		write_number_to_str(str, pos_min, min, 0);
+		write_number_to_str(str, pos_min, min);
 
 	if (10 > sec){
 		*(str + pos_sec) = ' ';
-		write_number_to_str(str, pos_sec + 1, sec, 0);
+		write_number_to_str(str, pos_sec + 1, sec);
 	}
 	else
-		write_number_to_str(str, pos_sec, sec, 0);
+		write_number_to_str(str, pos_sec, sec);
 }
 
-void write_int_to_lcd(unsigned char number, unsigned char x, unsigned char y)
+void print_int_to_lcd(unsigned char number, unsigned char x, unsigned char y)
 {
 	if (10 > number){
 		print_char_at_xy(' ', x++, y);
@@ -137,7 +132,7 @@ void set_program( void )
 {
 	program_number = 0;
 	print_string_lcd(set_program_msg, 13);
-	write_int_to_lcd(program_number + 1, 12, 0);
+	print_int_to_lcd(program_number + 1, 12, 0);
 	for ( ;; )
 	{
 		if (0 == read_key(&symbol))
@@ -150,7 +145,7 @@ void set_program( void )
 				if (set_time()) return;
 				program_number = 0;
 				print_string_lcd(set_program_msg, 13);
-				write_int_to_lcd(program_number + 1, 12, 0);
+				print_int_to_lcd(program_number + 1, 12, 0);
 				break;
 			case MORE_SIGN:
 				make_sound(0);
@@ -164,7 +159,7 @@ void set_program( void )
 				continue;
 		}
 
-		write_int_to_lcd(program_number + 1, 12, 0);
+		print_int_to_lcd(program_number + 1, 12, 0);
 	}
 }
 
@@ -204,18 +199,18 @@ char set_time( void )
 		{
 			set_time_msg[9] = ' ';
 			set_time_msg[10] = ' ';
-			write_number_to_str(set_time_msg, 11, time, 0);
+			write_number_to_str(set_time_msg, 11, time);
 		}
 		else if (time < 100)
 		{
 			set_time_msg[9] = ' ';
-			write_number_to_str(set_time_msg, 10, time, 0);
+			write_number_to_str(set_time_msg, 10, time);
 		}
 		else
 		{
-			write_number_to_str(set_time_msg, 9, time, 0);
+			write_number_to_str(set_time_msg, 9, time);
 		}
-		write_int_to_lcd(time, 9, 0);
+		print_int_to_lcd(time, 9, 0);
 	}
 }
 
@@ -254,13 +249,13 @@ char set_temperature( void )
 		if (temp < 100)
 		{
 			set_temperature_msg[8] = ' ';
-			write_number_to_str(set_temperature_msg, 9, temp, 0);
+			write_number_to_str(set_temperature_msg, 9, temp);
 		}
 		else
 		{
-			write_number_to_str(set_temperature_msg, 8, temp, 0);
+			write_number_to_str(set_temperature_msg, 8, temp);
 		}
-		write_int_to_lcd(temp, 8, 0);
+		print_int_to_lcd(temp, 8, 0);
 	}
 }
 
@@ -282,8 +277,8 @@ char cooking_process( void )
 		leds(~(255 >> luminous_leds));
 		// 
 		wait_sec(&time, &seconds);
-		write_int_to_lcd(time, 5, 1);
-		write_int_to_lcd(seconds, 10, 1);
+		print_int_to_lcd(time, 5, 1);
+		print_int_to_lcd(seconds, 10, 1);
 
 		if (0 == time && 0 == seconds)
 			if (dish_is_cooked()) return 1;
