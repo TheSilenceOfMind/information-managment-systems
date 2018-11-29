@@ -24,7 +24,7 @@ __xdata    unsigned char symbol;
 __xdata unsigned char set_program_msg[14] = "set program ";
 __xdata unsigned char set_time_msg[17] = "set time  30 min";
 __xdata unsigned char cooking_process_msg[32] = "before cooking  time 100 m 60 s";
-__xdata unsigned char set_temperature_msg[31] = "set t =  90     degrees Celsius";
+__xdata unsigned char set_temperature_msg[32] = "set t =  90     degrees Celsius";
 __xdata unsigned char dish_is_cooked_msg[16] = "Dish is cooked!";
 
 char set_time( void );

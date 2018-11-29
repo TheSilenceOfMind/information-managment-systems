@@ -4,6 +4,10 @@
 #include "max.h"
 
 extern unsigned char note_delay[2];
+extern const unsigned short notes[];
+extern const unsigned short ok_btn_notes[];
+extern const unsigned short err_btn_notes[];
+
 unsigned char cur_mode;
 
 unsigned char current_ena;
@@ -12,7 +16,7 @@ unsigned char volume = 0x1C; // максимальная громкость во
 uint32_t cur_note_time; // время воспроизведения текущей ноты, используется как счетчик: от определенного значения до 0, после чего тональность ноты изменяется, и этот параметр снова инициализируется.
 char end_of_melody = 0; // 1 - дорожка музыки закончилась, 0 - иначе.
 
-extern const unsigned short notes[] = {
+const unsigned short notes[] = {
         392, 392, 392, 311, 466, 392, 311, 466, 392,
 		587, 587, 587, 622, 466, 369, 311, 466, 392,
 		784, 392, 392, 784, 739, 698, 659, 622, 659,
@@ -20,11 +24,11 @@ extern const unsigned short notes[] = {
 		311, 369, 311, 466, 392
 };
 
-extern const unsigned short ok_btn_notes[] = {
+const unsigned short ok_btn_notes[] = {
 	200, 400, 600
 };
 
-extern const unsigned short err_btn_notes[] = {
+const unsigned short err_btn_notes[] = {
 	600, 400, 200
 };
 
