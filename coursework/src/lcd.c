@@ -142,6 +142,16 @@ void print_char_lcd(char ch) {
 }
 
 
+void print_char_at_xy(char ch, char x, char y) {
+	char tmp_x = cur_x;
+	char tmp_y = cur_y;
+	
+	goto_xy(x, y);
+	write_max((unsigned char __xdata *)DATA_IND, ch);
+    strobe(0xC);	//R/W = 0, RS = 1 (данные)
+	goto_xy(tmp_x, tmp_y);
+}
+
 /**----------------------------------------------------------------------------
                         print_string_lcd()
 -------------------------------------------------------------------------------

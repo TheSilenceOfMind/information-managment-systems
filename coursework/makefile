@@ -62,6 +62,8 @@ term:
 
 
 MULTICOOKER_SRC = \
+$(SRC_DIR)/speaker.c \
+$(SRC_DIR)/helper.c \
 $(SRC_DIR)/keyboard.c \
 $(SRC_DIR)/lcd.c \
 $(SRC_DIR)/led.c \
