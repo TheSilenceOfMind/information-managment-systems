@@ -164,17 +164,21 @@ void ScanKBOnce(void) __interrupt( 0 )
                 if( !row )
                 {
 					fl = 1;
-					if (key_flags[(colnum<<2) + rownum] == 1)
-						key_flags[(colnum<<2) + rownum] = 2;
-					else if (key_flags[(colnum<<2) + rownum] == 0)
+
+					if (key_flags[(colnum<<2) + rownum] == 0)
+					{
 						key_flags[(colnum<<2) + rownum] = 1;
+
+						keyboard_buff[keyboard_len % KB_BUFFER_SIZE] = KBTable[i];
+						keyboard_len++;
+					}
                 }
 				else{
 					key_flags[(colnum<<2) + rownum] = 0;
 				}
             }
         }
-		
+
 		if (fl == 0)
 		{
 			key_flags[(colnum<<2) + 0] = 0;
@@ -182,14 +186,5 @@ void ScanKBOnce(void) __interrupt( 0 )
 			key_flags[(colnum<<2) + 2] = 0;
 			key_flags[(colnum<<2) + 3] = 0;
 		}
-
     }
-
-	for (i = 0; i < 16; ++i)
-		if (key_flags[i] == 1){
-			keyboard_buff[keyboard_len % KB_BUFFER_SIZE] = KBTable[i];
-			keyboard_len++;
-		}
-	
-	
 }
