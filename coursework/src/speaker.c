@@ -102,6 +102,7 @@ void init_sound(void)
 {
     set_volume(volume);
     set_vector(0x202B, (void *)note_handler);
+    IP |= 0x20;
     ET2 = 1; // Разрешаем прерывания от таймера 2
     EA = 1;  // Разрешаем все прерывания
 }

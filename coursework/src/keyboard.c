@@ -107,6 +107,7 @@ API-функция чтения символа из буфера клавиат�
 char read_keyboard(unsigned char* symbol) {
     int i;
 
+    EX0 = 1;
 	if ( 0 < keyboard_len )
 	{
 		*symbol = keyboard_buff[0];

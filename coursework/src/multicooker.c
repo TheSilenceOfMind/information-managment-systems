@@ -32,13 +32,6 @@ char set_temperature( void );
 char cooking_process( void );
 char dish_is_cooked( void );
 
-char read_key(unsigned char* symbol)
-{
-    EX0 = 1;
-    IP |= 0x20;
-
-    return read_keyboard(symbol);
-}
 
 void print_int_to_lcd(unsigned char number, unsigned char x, unsigned char y)
 {
@@ -92,7 +85,7 @@ void set_program( void )
     print_int_to_lcd(program_number + 1, 12, 0);
     for ( ;; )
     {
-        if (0 == read_key(&symbol))
+        if (0 == read_keyboard(&symbol))
             continue;
 
         switch (symbol)
@@ -126,7 +119,7 @@ char set_time( void )
     print_int_to_lcd(time, 9, 0);
     for ( ;; )
     {
-        if (0 == read_key(&symbol))
+        if (0 == read_keyboard(&symbol))
             continue;
 
         switch (symbol)
@@ -163,7 +156,7 @@ char set_temperature( void )
     print_int_to_lcd(temp, 8, 0);
     for ( ;; )
     {
-        if (0 == read_key(&symbol))
+        if (0 == read_keyboard(&symbol))
             continue;
 
         switch (symbol)
@@ -218,7 +211,7 @@ char cooking_process( void )
         if (0 == time && 0 == seconds)
             if (dish_is_cooked()) return 1;
 
-        if (0 != read_key(&symbol) && PREV_SIGN == symbol){
+        if (0 != read_keyboard(&symbol) && PREV_SIGN == symbol){
             make_sound(0);
             return 0;
         }
@@ -237,7 +230,7 @@ char dish_is_cooked( void )
         leds(255);
         delay(300);
 
-        if (read_key(&symbol) > 0)
+        if (read_keyboard(&symbol) > 0)
             if (PREV_SIGN == symbol || NEXT_SIGN == symbol ||
                 LESS_SIGN == symbol || MORE_SIGN == symbol)
             {
