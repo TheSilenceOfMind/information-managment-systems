@@ -13,7 +13,7 @@ unsigned char cur_mode;
 unsigned char current_ena;
 unsigned char cur_note_ind;
 unsigned char volume = 0x1C; // максимальная громкость воспроизведения сигналов - все 4 бита в 1. 
-uint32_t cur_note_time; // время воспроизведения текущей ноты, используется как счетчик: от определенного значения до 0, после чего тональность ноты изменяется, и этот параметр снова инициализируется.
+unsigned long cur_note_time; // время воспроизведения текущей ноты, используется как счетчик: от определенного значения до 0, после чего тональность ноты изменяется, и этот параметр снова инициализируется.
 char end_of_melody = 0; // 1 - дорожка музыки закончилась, 0 - иначе.
 
 const unsigned short notes[] = {
@@ -89,14 +89,19 @@ mode:
 void make_sound(unsigned char mode)
 {	
 	T2CON = 0x00; // Выключение таймера 2
-	
+
 	end_of_melody = 0;
 	cur_note_ind = 0;
-	set_volume(volume);
     set_next_note(mode);
 	cur_mode = mode; // Необходимо для того, чтобы обработчик прерывания идентифицировал, какой режим сейчас работает.
-    set_vector(0x202B, (void *)note_handler);
-	
+
     T2CON = 0x04; // Включение таймера 2
-    ET2 = 1; // разрешаем прерывания от таймера 2
+}
+
+void init_sound(void)
+{
+    set_volume(volume);
+    set_vector(0x202B, (void *)note_handler);
+    ET2 = 1; // Разрешаем прерывания от таймера 2
+    EA = 1;  // Разрешаем все прерывания
 }

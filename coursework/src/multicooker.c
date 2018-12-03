@@ -252,7 +252,8 @@ char dish_is_cooked( void )
 void main( void )
 {
     init_keyboard((void*)ScanKBOnce);
-    EA = 1;
+    init_sound();
+
     for ( ;; )
     {
         leds(0);
