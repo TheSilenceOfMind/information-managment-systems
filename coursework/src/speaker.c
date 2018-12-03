@@ -42,13 +42,13 @@ unsigned int get_scaled_delay(unsigned short note) {
 
 void set_next_note(unsigned char mode){
 	compute_note_delay(mode, cur_note_ind);
-	if (mode == 2)
+	if (mode == DISH_IS_COOKED_SOUND)
 		cur_note_time = get_scaled_delay(notes[cur_note_ind]);
 	else
 		cur_note_time = 50;
 	
 	cur_note_ind++;
-	if (mode == 2)
+	if (mode == DISH_IS_COOKED_SOUND)
 		cur_note_ind = cur_note_ind % 39; // 39 - кол-во элементов notes[]
 	else 
 		cur_note_ind = cur_note_ind % 3;
@@ -82,9 +82,8 @@ void set_volume(unsigned char v) {
 
 /* 
 mode: 
-	0 - success key press
-	1 - failure key press
-	2 - end of cook process
+	KEY_PRESSED_SOUND - success key press
+	DISH_IS_COOKED_SOUND - end of cook process
 */
 void make_sound(unsigned char mode)
 {	

@@ -91,17 +91,17 @@ void set_program( void )
         switch (symbol)
         {
             case NEXT_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 if (set_time()) return;
                 program_number = 0;
                 print_string_lcd(set_program_msg, 13);
                 break;
             case MORE_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 program_number = (program_number + 1) % MAX_PROGRAM_NUMBER;
                 break;
             case LESS_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 program_number = (MAX_PROGRAM_NUMBER + program_number - 1) % MAX_PROGRAM_NUMBER;
                 break;
             default:
@@ -125,20 +125,20 @@ char set_time( void )
         switch (symbol)
         {
             case PREV_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 return 0;
             case NEXT_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 if (set_temperature()) return 1;
                 time = 30;
                 print_string_lcd(set_time_msg, 16);
                 break;
             case MORE_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 time = (time + 5 > MAX_TIME) ? MIN_TIME : time + 5;
                 break;
             case LESS_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 time = (time - 5 < MIN_TIME) ? MAX_TIME : time - 5;
                 break;
             default:
@@ -162,20 +162,20 @@ char set_temperature( void )
         switch (symbol)
         {
             case PREV_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 return 0;
             case NEXT_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 if (cooking_process()) return 1;
                 temp = 90;
                 print_string_lcd(set_temperature_msg, 31);
                 break;
             case MORE_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 temp = (temp + 10 > MAX_TEMPERATURE) ? MIN_TEMPERATURE : temp + 10;
                 break;
             case LESS_SIGN:
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 temp = (temp - 10 < MIN_TEMPERATURE) ? MAX_TEMPERATURE : temp - 10;
                 break;
             default:
@@ -212,7 +212,7 @@ char cooking_process( void )
             if (dish_is_cooked()) return 1;
 
         if (0 != read_keyboard(&symbol) && PREV_SIGN == symbol){
-            make_sound(0);
+            make_sound(KEY_PRESSED_SOUND);
             return 0;
         }
     }
@@ -221,7 +221,7 @@ char cooking_process( void )
 char dish_is_cooked( void )
 {
     print_string_lcd(dish_is_cooked_msg, 15);
-    make_sound(2);
+    make_sound(DISH_IS_COOKED_SOUND);
 
     for ( ;; )
     {
@@ -234,7 +234,7 @@ char dish_is_cooked( void )
             if (PREV_SIGN == symbol || NEXT_SIGN == symbol ||
                 LESS_SIGN == symbol || MORE_SIGN == symbol)
             {
-                make_sound(0);
+                make_sound(KEY_PRESSED_SOUND);
                 break;
             }
     }
